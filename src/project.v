@@ -55,6 +55,6 @@ module tt_um_Xelef2000 (
     );
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, ui_in, 1'b0};
+  wire _unused = &{ena, ui_in, uio_in, uart_tx_busy};
 
 endmodule

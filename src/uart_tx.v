@@ -103,7 +103,7 @@ localparam FSM_STOP = 3;
 assign uart_tx_busy = fsm_state != FSM_IDLE;
 assign uart_txd     = txd_reg;
 
-wire next_bit     = cycle_counter == CYCLES_PER_BIT;
+wire next_bit     = cycle_counter == { {(COUNT_REG_LEN-($clog2(CYCLES_PER_BIT)+1)){1'b0}}, CYCLES_PER_BIT[$clog2(CYCLES_PER_BIT):0] };
 wire payload_done = bit_counter   == PAYLOAD_BITS  ;
 wire stop_done    = bit_counter   == STOP_BITS && fsm_state == FSM_STOP;
 
@@ -145,9 +145,9 @@ always @(posedge clk) begin : p_bit_counter
     if(!resetn) begin
         bit_counter <= 4'b0;
     end else if(fsm_state != FSM_SEND && fsm_state != FSM_STOP) begin
-        bit_counter <= {COUNT_REG_LEN{1'b0}};
+        bit_counter <= 4'b0;
     end else if(fsm_state == FSM_SEND && n_fsm_state == FSM_STOP) begin
-        bit_counter <= {COUNT_REG_LEN{1'b0}};
+        bit_counter <= 4'b0;
     end else if(fsm_state == FSM_STOP&& next_bit) begin
         bit_counter <= bit_counter + 1'b1;
     end else if(fsm_state == FSM_SEND && next_bit) begin
