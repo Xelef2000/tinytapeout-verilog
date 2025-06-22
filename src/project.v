@@ -15,14 +15,42 @@ module tt_um_Xelef2000 (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-  
+
+  // All output pins must be assigned. If not used, assign to 0.
   assign uio_out = 0;
   assign uio_oe  = 0;
 
-  assign uo_out = ui_in;
+  wire TX;
+  assign uo_out[0] = TX; 
+  assign uo_out[7:1] = 0; // Unused outputs
 
+
+  localparam BIT_RATE = 9600; // bits/sec
+  localparam PAYLOAD_BITS = 8; // Number of data bits in the UART packet
+  localparam CLK_HZ = 20_000_000; // Clock frequency in h
+
+  wire uart_tx_en;
+  wire uart_tx_busy; 
+  wire [PAYLOAD_BITS-1:0] uart_tx_data;
+
+  assign TX = 0; // test
+
+
+
+    // uart_tx #(
+    //     .BIT_RATE(BIT_RATE),
+    //     .PAYLOAD_BITS(PAYLOAD_BITS),
+    //     .CLK_HZ(CLK_HZ)
+    // ) i_uart_tx(
+    //     .clk(sys_clk),              // Use the divided system clock
+    //     .resetn(~reset),            // Active low reset
+    //     .uart_txd(TX),              // Connect to the TX output pin
+    //     .uart_tx_en(uart_tx_en),
+    //     .uart_tx_busy(uart_tx_busy),
+    //     .uart_tx_data(uart_tx_data)
+    // );
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n,uio_in, 1'b0};
+  wire _unused = &{ena, clk, rst_n, ui_in, 1'b0};
 
 endmodule
