@@ -35,20 +35,21 @@ module tt_um_Xelef2000 (
 
   assign TX = 0; // test
 
+  assign uart_tx_en = 1; // Enable UART transmission
+  assign uart_tx_data = 8'h55; // Example data to send (0x55)
 
-
-    // uart_tx #(
-    //     .BIT_RATE(BIT_RATE),
-    //     .PAYLOAD_BITS(PAYLOAD_BITS),
-    //     .CLK_HZ(CLK_HZ)
-    // ) i_uart_tx(
-    //     .clk(sys_clk),              // Use the divided system clock
-    //     .resetn(~reset),            // Active low reset
-    //     .uart_txd(TX),              // Connect to the TX output pin
-    //     .uart_tx_en(uart_tx_en),
-    //     .uart_tx_busy(uart_tx_busy),
-    //     .uart_tx_data(uart_tx_data)
-    // );
+    uart_tx #(
+        .BIT_RATE(BIT_RATE),
+        .PAYLOAD_BITS(PAYLOAD_BITS),
+        .CLK_HZ(CLK_HZ)
+    ) i_uart_tx(
+        .clk(clk),              // Use the divided system clock
+        .resetn(rst_n),            // Active low reset
+        .uart_txd(TX),              // Connect to the TX output pin
+        .uart_tx_en(uart_tx_en),
+        .uart_tx_busy(uart_tx_busy),
+        .uart_tx_data(uart_tx_data)
+    );
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, clk, rst_n, ui_in, 1'b0};
