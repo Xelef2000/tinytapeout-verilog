@@ -1,0 +1,8 @@
+read_verilog -sv top.v 
+
+
+# Set the top module
+hierarchy -top top
+
+# Synthesize for Gowin FPGA
+synth_gowin -top top -json _build/hardware.json
