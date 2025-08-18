@@ -6,6 +6,6 @@ module ring_osc (
     output OUT  // The output that produces the random bitstream
 );
     // Mark this module as a black box for the synthesis tool.
-    (* blackbox *)
+    (* blackbox *);
 
 endmodule
