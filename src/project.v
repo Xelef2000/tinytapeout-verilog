@@ -18,23 +18,22 @@ module tt_um_Xelef2000 (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
+    // ---- Tie off unused inputs ----
+    // Prevent floating pins
+    wire _unused = &{ ui_in, uio_in, ena, clk, rst_n, 1'b0 };
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ring8;
-  assign uio_out = 8'b1111_1111;
-  assign uio_oe  = 8'b1111_1111;
+    // ---- Drive unused outputs ----
+    assign uio_out = 8'b0;   // all zeros
+    assign uio_oe  = 8'b0;   // disable all
+    assign uo_out[7:1] = 7'b0; // leave only uo_out[0] connected
 
-  wire ring_osc;
-  wire [7:0] ring8;
+    // ---- Your RO instance ----
+    wire rnd;
+    ring_osc ro0 (
+        .rnd(rnd)
+    );
 
-  assign ring8 = {7'b0, ring_osc};
-
-   ring_osc trng ( 
-        .rnd(ring_osc)
- );
-
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, ui_in, uio_in, 1'b0};
+    // Connect the random output to one pin
+    assign uo_out[0] = rnd;
 
 endmodule
-
