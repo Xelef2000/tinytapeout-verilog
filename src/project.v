@@ -25,7 +25,7 @@ module tt_um_Xelef2000 (
     wire _unused = &{ena, clk, rst_n, uio_in, ui_in, uo_out[7:1]};
 
 
-    ro_trng trng ( 
+    ring_osc trng ( 
         .rnd(uo_out[0])
     );
 
