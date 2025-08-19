@@ -19,10 +19,10 @@ module tt_um_Xelef2000 (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    // All output pins must be assigned.
-    assign uo_out[7:1] = 7'b0; // Assign unused bits to 0
-    assign uio_out     = 8'h00;
-    assign uio_oe      = 8'h00;
+    assign uio_out = 0;
+    assign uio_oe  = 0;
+
+    wire _unused = &{ena, clk, rst_n, uio_in, ui_in, uo_out[7:1]};
 
 
     ro_trng trng ( 
