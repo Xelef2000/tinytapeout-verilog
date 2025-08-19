@@ -5,7 +5,7 @@
 
 `default_nettype none
 `include "./uart_tx.v"
-`include "./ring_osc_stub.v"
+`include "./ring_osc.v"
 
 module tt_um_Xelef2000 (
 
