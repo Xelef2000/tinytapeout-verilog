@@ -25,15 +25,12 @@ module tt_um_Xelef2000 (
     // ---- Drive unused outputs ----
     assign uio_out = 8'b0;   // all zeros
     assign uio_oe  = 8'b0;   // disable all
-    assign uo_out[7:1] = 7'b0; // leave only uo_out[0] connected
+    assign uo_out[7:0] =  {7'b0, rnd};
 
     // ---- Your RO instance ----
     wire rnd;
     ring_osc ro0 (
         .rnd(rnd)
     );
-
-    // Connect the random output to one pin
-    assign uo_out[0] = rnd;
 
 endmodule
