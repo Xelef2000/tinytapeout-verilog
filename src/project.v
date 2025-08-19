@@ -25,9 +25,8 @@ module tt_um_Xelef2000 (
     assign uio_oe      = 8'h00;
 
 
-    ring_osc trng ( 
-        .EN(ui_in[0]),
-        .OUT(uo_out[0])
+    ro_trng trng ( 
+        .rnd(uo_out[0])
     );
 
 
