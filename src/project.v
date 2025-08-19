@@ -22,12 +22,17 @@ module tt_um_Xelef2000 (
     assign uio_out = 0;
     assign uio_oe  = 0;
 
-    wire _unused = &{ena, clk, rst_n, uio_in, ui_in, uo_out[7:1]};
+    wire ring_osc;
+    
 
 
     ring_osc trng ( 
-        .rnd(uo_out[0])
+        .rnd(ring_osc)
     );
+
+    assign uo_out = {ring_osc, 7'b0};
+
+    wire _unused = &{ena, clk, rst_n, uio_in, ui_in};
 
 
 endmodule
