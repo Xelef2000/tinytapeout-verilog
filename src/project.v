@@ -19,20 +19,22 @@ module tt_um_Xelef2000 (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    assign uio_out = 0;
-    assign uio_oe  = 0;
+  // All output pins must be assigned. If not used, assign to 0.
+  assign uo_out  = (ui_in + uio_in) & ring8;
+  assign uio_out = 0;
+  assign uio_oe  = 0;
 
-    wire ring_osc;
-    
+  wire ring_osc;
+  wire [7:0] ring8;
 
+  assign ring8 = {7'b0, ring_osc};
 
-    ring_osc trng ( 
+   ring_osc trng ( 
         .rnd(ring_osc)
-    );
+ );
 
-    assign uo_out = {ring_osc, 7'b0};
-
-    wire _unused = &{ena, clk, rst_n, uio_in, ui_in};
-
+  // List all unused inputs to prevent warnings
+  wire _unused = &{ena, clk, rst_n, 1'b0};
 
 endmodule
+
