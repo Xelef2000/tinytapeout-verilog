@@ -13,7 +13,7 @@ module sg13g2_stdcell_nand2_1 (Y, A, B);
     input A, B;
 endmodule
 
-module sg1g2_stdcell_inv_1 (Y, A);
+module sg13g2_stdcell_inv_1 (Y, A);
     output Y;
     input A;
 endmodule
