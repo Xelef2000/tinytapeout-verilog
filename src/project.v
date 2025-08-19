@@ -19,8 +19,7 @@ module tt_um_Xelef2000 (
     input  wire       rst_n     // reset_n - low to reset
 );
     // ---- Tie off unused inputs ----
-    // Prevent floating pins
-    wire _unused = &{ ui_in, uio_in, ena, clk, rst_n, 1'b0 };
+    // This section is now empty after removing the problematic line.
 
     // ---- Drive unused outputs ----
     assign uio_out = 8'b0;   // all zeros
