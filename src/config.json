@@ -31,7 +31,7 @@
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
   "CLOCK_PORT": "clk",
 
-  "VERILOG_FILES_BLACKBOX": [
+  "EXTRA_VERILOG_MODELS": [
     "dir::src/ring_osc_impl.v"
   ],
 
