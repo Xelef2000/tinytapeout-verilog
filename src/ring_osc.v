@@ -1,5 +1,6 @@
 // File: src/ring_osc_impl.v
 // This is the actual implementation using IHP SG13G2 standard cells.
+`include "./pdk_stubs.v"
 
 module ring_osc (
     input  EN,
