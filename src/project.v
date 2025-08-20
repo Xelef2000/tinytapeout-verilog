@@ -40,6 +40,7 @@ module tt_um_Xelef2000 (
     random32 i_random (
         .clk(clk),
         .en(ena),
+        .rst_n(rst_n),
         .rnd_out(random_number_w),
         .ready(random_ready_w),
         .ring_out_6(ring_out_6),
