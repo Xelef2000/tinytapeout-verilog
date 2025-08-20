@@ -1,6 +1,6 @@
 `default_nettype none
 
-module ring_osc (
+module ring_osc_6 (
     input  wire en, 
     output wire rnd 
 );
