@@ -1,4 +1,3 @@
-
 `default_nettype none
 
 `include "ring_osc_6.v"
@@ -7,6 +6,7 @@
 
 module random32 (
     input  wire       clk,      // system clock
+    input  wire       rst_n,    // active-low asynchronous reset
     input  wire       en,       // enable
     output reg [31:0] rnd_out,  // random 32-bit number
     output reg        ready,    // high for 1 cycle when rnd_out is fresh
@@ -24,6 +24,7 @@ module random32 (
     reg  sync1, sync2;
     wire rnd_sync;
 
+    // Ring oscillators are enabled by the 'en' signal
     ring_osc_6 u_ring6 (.en(en), .rnd(ring_bit_6));
     ring_osc_12 u_ring12 (.en(en), .rnd(ring_bit_12));
     ring_osc_24 u_ring24 (.en(en), .rnd(ring_bit_24));
@@ -34,9 +35,15 @@ module random32 (
 
     assign combined_ring_bit = ring_bit_6 ^ ring_bit_12 ^ ring_bit_24;
 
-    always @(posedge clk) begin
-        sync1 <= combined_ring_bit;
-        sync2 <= sync1;
+    // Synchronizer for the combined random bit stream
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sync1 <= 1'b0;
+            sync2 <= 1'b0;
+        end else begin
+            sync1 <= combined_ring_bit;
+            sync2 <= sync1;
+        end
     end
     assign rnd_sync = sync2;
 
@@ -57,46 +64,52 @@ module random32 (
     assign debiased_bit = out_bit_reg;
     assign debiased_bit_valid = out_valid_reg;
 
-    always @(posedge clk) begin
-        if (!en) begin
-            state <= S_WAIT_FIRST;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state         <= S_WAIT_FIRST;
             out_valid_reg <= 1'b0;
+            first_bit     <= 1'b0;
+            out_bit_reg   <= 1'b0;
         end else begin
-            out_valid_reg <= 1'b0;
-            
-            if (state == S_WAIT_FIRST) begin
-                first_bit <= rnd_sync;
-                state     <= S_WAIT_SECOND;
-            end else begin
-                if (first_bit != rnd_sync) begin
-                    out_bit_reg   <= first_bit;
-                    out_valid_reg <= 1'b1;
+            if (en) begin
+                out_valid_reg <= 1'b0; // Default assignment
+                
+                if (state == S_WAIT_FIRST) begin
+                    first_bit <= rnd_sync;
+                    state     <= S_WAIT_SECOND;
+                end else begin // state == S_WAIT_SECOND
+                    if (first_bit != rnd_sync) begin
+                        out_bit_reg   <= first_bit;
+                        out_valid_reg <= 1'b1;
+                    end
+                    state <= S_WAIT_FIRST;
                 end
-                state <= S_WAIT_FIRST;
             end
         end
     end
 
     // ===================================================================
-    // Section 3: Data Collection (Modified to use debiased bits)
+    // Section 3: Data Collection
     // ===================================================================
     reg [4:0] bit_count;
 
-    always @(posedge clk) begin
-        if (!en) begin
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
             rnd_out   <= 32'b0;
             bit_count <= 5'd0;
             ready     <= 1'b0;
         end else begin
-            ready <= 1'b0;
-            
-            if (debiased_bit_valid) begin
-                rnd_out <= {rnd_out[30:0], debiased_bit};
-                bit_count <= bit_count + 1;
+            if (en) begin
+                ready <= 1'b0; // Default assignment
+                
+                if (debiased_bit_valid) begin
+                    rnd_out <= {rnd_out[30:0], debiased_bit};
+                    bit_count <= bit_count + 1;
 
-                if (bit_count == 5'd31) begin
-                    ready     <= 1'b1;
-                    bit_count <= 5'd0;
+                    if (bit_count == 5'd31) begin
+                        ready     <= 1'b1;
+                        bit_count <= 5'd0;
+                    end
                 end
             end
         end

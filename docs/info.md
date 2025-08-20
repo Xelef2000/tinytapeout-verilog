@@ -9,7 +9,7 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Testing verilog
+This is a true random number generator (TRNG) project that uses a ring oscillator to generate random numbers. The design includes a UART transmitter to send the generated random numbers over a serial interface.
 
 ## How to test
 
