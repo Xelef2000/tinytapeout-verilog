@@ -4,21 +4,13 @@ set -x
 
 mkdir -p _build
 
-# Synthesis with Yosys
-yosys -s run_yosys.ys
+# Synthesis with Yosys, defining the target FPGA
+yosys -D ECP5_FPGA -s run_yosys.ys
 
-# Place and route with nextpnr-himbaechel for GW2A-18C
-nextpnr-himbaechel --json _build/hardware.json \
-                   --write _build/hardware_pnr.json \
-                   --device GW2A-LV18PG256C8/I7 \
-                   --vopt cst=top.cst \
-                   --vopt family=GW2A-18C \
-                   --report _build/hardware.pnr \
-                   --top top 
+# Place and Route for a specific ECP5 device
+nextpnr-ecp5 --25k --package CABGA256 --ignore-loops --speed 6 --json _build/hardware.json --textcfg _build/hardware.config --report _build/hardware.pnr --lpf top.lpf
 
-# Pack bitstream with Gowin tools
-gowin_pack -d GW2A-18C -o _build/hardware.fs _build/hardware_pnr.json
+# Pack bitstream
+ecppack --svf _build/hardware.svf _build/hardware.config _build/hardware.bit
 
 ls -al _build
-
-echo "Build complete! Use openFPGALoader or Gowin Programmer to flash _build/hardware.fs"
