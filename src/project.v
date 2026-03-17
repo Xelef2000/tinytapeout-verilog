@@ -140,64 +140,99 @@ module tt_um_Xelef2000 (
     wire [6:0] seg_out = hex_to_7seg(current_nibble);
 
     // State machine definitions
-    localparam FSM_IDLE = 1'b0;
-    localparam FSM_SEND = 1'b1;
-    
-    // State machine registers
-    reg fsm_state_r;
-    reg [1:0] byte_counter_r;
+    localparam FSM_IDLE     = 2'd0;
+    localparam FSM_SEND     = 2'd1;
+    localparam FSM_WAIT_BSY = 2'd2;  // Wait for UART to become busy
+    localparam FSM_WAIT_RDY = 2'd3;  // Wait for UART to become ready
 
-    reg fsm_state_next;
-    reg [1:0] byte_counter_next;
+    // State machine registers
+    reg [1:0] fsm_state_r;
+    reg [3:0] byte_counter_r;  // 0-9: 8 hex chars + \r + \n
+
+    reg [1:0] fsm_state_next;
+    reg [3:0] byte_counter_next;
     reg uart_tx_en_next;
     reg [7:0] uart_tx_data_next;
     reg [31:0] random_buffer_next;
 
+    // Function to convert 4-bit nibble to ASCII hex character
+    function [7:0] nibble_to_ascii;
+        input [3:0] nibble;
+        begin
+            if (nibble < 4'd10)
+                nibble_to_ascii = 8'd48 + nibble;  // '0' = 48
+            else
+                nibble_to_ascii = 8'd55 + nibble;  // 'A' = 65, so 55 + 10 = 65
+        end
+    endfunction
+
+    // Select nibble based on byte counter (send MSB first)
+    wire [3:0] current_nibble;
+    assign current_nibble = (byte_counter_r == 4'd0) ? random_buffer_r[31:28] :
+                            (byte_counter_r == 4'd1) ? random_buffer_r[27:24] :
+                            (byte_counter_r == 4'd2) ? random_buffer_r[23:20] :
+                            (byte_counter_r == 4'd3) ? random_buffer_r[19:16] :
+                            (byte_counter_r == 4'd4) ? random_buffer_r[15:12] :
+                            (byte_counter_r == 4'd5) ? random_buffer_r[11:8]  :
+                            (byte_counter_r == 4'd6) ? random_buffer_r[7:4]   :
+                                                       random_buffer_r[3:0];
+
     always @(*) begin
         fsm_state_next     = fsm_state_r;
         byte_counter_next  = byte_counter_r;
-        uart_tx_en_next    = 1'b0; // Default to not sending
+        uart_tx_en_next    = 1'b0;
         uart_tx_data_next  = uart_tx_data_r;
         random_buffer_next = random_buffer_r;
 
         case (fsm_state_r)
             FSM_IDLE: begin
-                // If a new random number is ready, latch it and prepare to send.
                 if (random_ready_w) begin
                     random_buffer_next = random_number_w;
                     fsm_state_next     = FSM_SEND;
-                    byte_counter_next  = 2'b00; // Reset byte counter
+                    byte_counter_next  = 4'd0;
                 end
             end
 
             FSM_SEND: begin
-                // Only proceed if the UART module is not busy
-                if (!uart_busy_w) begin
-                    uart_tx_en_next = 1'b1; // Enable transmission
-                    
-                    // Select the correct byte to send based on the current counter value
-                    case (byte_counter_r)
-                        2'b00: uart_tx_data_next = random_buffer_r[7:0];
-                        2'b01: uart_tx_data_next = random_buffer_r[15:8];
-                        2'b10: uart_tx_data_next = random_buffer_r[23:16];
-                        2'b11: uart_tx_data_next = random_buffer_r[31:24];
-                    endcase
+                // Start transmission of current byte
+                uart_tx_en_next = 1'b1;
+                fsm_state_next = FSM_WAIT_BSY;
 
-                    // After sending the last byte, return to IDLE. Otherwise, increment counter.
-                    if (byte_counter_r == 2'b11) begin
+                if (byte_counter_r == 4'd8)
+                    uart_tx_data_next = 8'h0D;  // '\r'
+                else if (byte_counter_r == 4'd9)
+                    uart_tx_data_next = 8'h0A;  // '\n'
+                else
+                    uart_tx_data_next = nibble_to_ascii(current_nibble);
+            end
+
+            FSM_WAIT_BSY: begin
+                // Wait for UART to acknowledge (become busy)
+                if (uart_busy_w) begin
+                    fsm_state_next = FSM_WAIT_RDY;
+                end
+            end
+
+            FSM_WAIT_RDY: begin
+                // Wait for UART to finish (become ready)
+                if (!uart_busy_w) begin
+                    if (byte_counter_r == 4'd9) begin
                         fsm_state_next = FSM_IDLE;
                     end else begin
                         byte_counter_next = byte_counter_r + 1;
+                        fsm_state_next = FSM_SEND;
                     end
                 end
             end
+
+            default: fsm_state_next = FSM_IDLE;
         endcase
     end
 
     always @(posedge clk) begin
         if (!rst_n) begin
             fsm_state_r     <= FSM_IDLE;
-            byte_counter_r  <= 2'b00;
+            byte_counter_r  <= 4'd0;
             uart_tx_en_r    <= 1'b0;
             uart_tx_data_r  <= 8'h00;
             random_buffer_r <= 32'h00000000;

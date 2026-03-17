@@ -35,7 +35,7 @@ module top(
 
  clk_divider i_clk_divider (
 	.clk_in(clk_i),
-	.reset(1'b1),  // Clock divider reset is active-low style, keep running
+	.reset(1'b0),  // Clock divider reset is active-high, keep it deasserted
 	.clk_out(chip_clk)
  );
 
