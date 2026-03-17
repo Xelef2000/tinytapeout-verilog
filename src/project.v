@@ -160,9 +160,9 @@ module tt_um_Xelef2000 (
         input [3:0] nibble;
         begin
             if (nibble < 4'd10)
-                nibble_to_ascii = 8'd48 + nibble;  // '0' = 48
+                nibble_to_ascii = 8'd48 + {4'b0, nibble};  // '0' = 48
             else
-                nibble_to_ascii = 8'd55 + nibble;  // 'A' = 65, so 55 + 10 = 65
+                nibble_to_ascii = 8'd55 + {4'b0, nibble};  // 'A' = 65, so 55 + 10 = 65
         end
     endfunction
 
