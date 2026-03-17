@@ -167,8 +167,8 @@ module tt_um_Xelef2000 (
     endfunction
 
     // Select nibble based on byte counter (send MSB first)
-    wire [3:0] current_nibble;
-    assign current_nibble = (byte_counter_r == 4'd0) ? random_buffer_r[31:28] :
+    wire [3:0] uart_nibble;
+    assign uart_nibble = (byte_counter_r == 4'd0) ? random_buffer_r[31:28] :
                             (byte_counter_r == 4'd1) ? random_buffer_r[27:24] :
                             (byte_counter_r == 4'd2) ? random_buffer_r[23:20] :
                             (byte_counter_r == 4'd3) ? random_buffer_r[19:16] :
@@ -203,7 +203,7 @@ module tt_um_Xelef2000 (
                 else if (byte_counter_r == 4'd9)
                     uart_tx_data_next = 8'h0A;  // '\n'
                 else
-                    uart_tx_data_next = nibble_to_ascii(current_nibble);
+                    uart_tx_data_next = nibble_to_ascii(uart_nibble);
             end
 
             FSM_WAIT_BSY: begin
