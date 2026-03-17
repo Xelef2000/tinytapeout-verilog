@@ -6,7 +6,7 @@
 
 module random32 (
     input  wire       clk,      // system clock
-    input  wire       rst_n,    // active-low asynchronous reset
+    input  wire       rst_n,    // active-low synchronous reset
     input  wire       en,       // enable
     output reg [31:0] rnd_out,  // random 32-bit number
     output reg        ready,    // high for 1 cycle when rnd_out is fresh
@@ -36,7 +36,7 @@ module random32 (
     assign combined_ring_bit = ring_bit_5 ^ ring_bit_11 ^ ring_bit_23;
 
     // Synchronizer for the combined random bit stream
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             sync1 <= 1'b0;
             sync2 <= 1'b0;
@@ -64,7 +64,7 @@ module random32 (
     assign debiased_bit = out_bit_reg;
     assign debiased_bit_valid = out_valid_reg;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             state         <= S_WAIT_FIRST;
             out_valid_reg <= 1'b0;
@@ -73,7 +73,7 @@ module random32 (
         end else begin
             if (en) begin
                 out_valid_reg <= 1'b0; // Default assignment
-                
+
                 if (state == S_WAIT_FIRST) begin
                     first_bit <= rnd_sync;
                     state     <= S_WAIT_SECOND;
@@ -93,7 +93,7 @@ module random32 (
     // ===================================================================
     reg [4:0] bit_count;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             rnd_out   <= 32'b0;
             bit_count <= 5'd0;
@@ -101,7 +101,7 @@ module random32 (
         end else begin
             if (en) begin
                 ready <= 1'b0; // Default assignment
-                
+
                 if (debiased_bit_valid) begin
                     rnd_out <= {rnd_out[30:0], debiased_bit};
                     bit_count <= bit_count + 1;

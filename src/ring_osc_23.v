@@ -1,3 +1,5 @@
+`default_nettype none
+
 module ring_osc_23 (
     input  wire en, 
     output wire rnd 

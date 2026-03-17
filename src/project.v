@@ -88,23 +88,55 @@ module tt_um_Xelef2000 (
     endfunction
 
     // Digit multiplexing counter (toggle between low and high nibble)
+    // Using 12-bit counter for ~122 Hz refresh at 500kHz clock
     reg digit_sel_r;
-    reg [15:0] mux_counter_r;
+    reg [11:0] mux_counter_r;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             digit_sel_r <= 1'b0;
-            mux_counter_r <= 16'b0;
+            mux_counter_r <= 12'b0;
         end else begin
             mux_counter_r <= mux_counter_r + 1;
-            if (mux_counter_r == 16'd0) begin
+            if (mux_counter_r == 12'd0) begin
                 digit_sel_r <= ~digit_sel_r;
             end
         end
     end
 
+    // Slow display update buffer (separate from UART buffer)
+    // Speed controlled by ui_in (DIP switches)
+    // At 500kHz: 30 min = 900,000,000 cycles (need 30 bits)
+    // ui_in = 0x00: slowest (30 min), ui_in = 0xFF: fastest (immediate)
+    // Uses exponential scaling: threshold = base >> (ui_in >> 3)
+    // This gives 32 speed levels, each step doubles the speed
+
+    reg [7:0] display_buffer_r;
+    reg [29:0] display_update_counter_r;
+
+    // Base threshold for 30 min at 500kHz
+    localparam [29:0] BASE_THRESHOLD = 30'd900000000;
+
+    // Compute threshold: shift base by upper 5 bits of ui_in
+    wire [4:0] shift_amount = ui_in[7:3]; // 0-31
+    wire [29:0] update_threshold = BASE_THRESHOLD >> shift_amount;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            display_buffer_r <= 8'b0;
+            display_update_counter_r <= 30'b0;
+        end else begin
+            if (display_update_counter_r >= update_threshold) begin
+                display_update_counter_r <= 30'b0;
+                display_buffer_r <= random_buffer_r[7:0];
+            end else begin
+                display_update_counter_r <= display_update_counter_r + 1;
+            end
+        end
+    end
+
     // Select nibble based on digit_sel_r and decode to 7-segment
-    wire [3:0] current_nibble = digit_sel_r ? random_buffer_r[7:4] : random_buffer_r[3:0];
+    wire [3:0] current_nibble = digit_sel_r ? display_buffer_r[7:4] : display_buffer_r[3:0];
     wire [6:0] seg_out = hex_to_7seg(current_nibble);
 
     // State machine definitions
@@ -162,7 +194,7 @@ module tt_um_Xelef2000 (
         endcase
     end
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             fsm_state_r     <= FSM_IDLE;
             byte_counter_r  <= 2'b00;
@@ -194,7 +226,7 @@ module tt_um_Xelef2000 (
     assign uio_out = {digit_sel_r, seg_out};
     assign uio_oe = 8'hFF; // Set all bidirectional IOs to outputs
 
-    wire _unused = &{uio_in, ui_in, 1'b0};
+    wire _unused = &{uio_in, ui_in[2:0], 1'b0};
 
 
 

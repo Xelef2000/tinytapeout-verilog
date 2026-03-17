@@ -15,4 +15,21 @@ IOBUF PORT "ring_out_12" IO_TYPE=LVCMOS33;
 LOCATE COMP "ring_out_24" SITE "G13";
 IOBUF PORT "ring_out_24" IO_TYPE=LVCMOS33;
 
+// 7-segment display outputs - UPDATE PINS FOR YOUR BOARD
+LOCATE COMP "seg[0]" SITE "L14";    // Segment a
+IOBUF PORT "seg[0]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[1]" SITE "M14";    // Segment b
+IOBUF PORT "seg[1]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[2]" SITE "N14";    // Segment c
+IOBUF PORT "seg[2]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[3]" SITE "M16";    // Segment d
+IOBUF PORT "seg[3]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[4]" SITE "L15";    // Segment e
+IOBUF PORT "seg[4]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[5]" SITE "L16";    // Segment f
+IOBUF PORT "seg[5]" IO_TYPE=LVCMOS33;
+LOCATE COMP "seg[6]" SITE "M15";    // Segment g
+IOBUF PORT "seg[6]" IO_TYPE=LVCMOS33;
 
+LOCATE COMP "digit_sel" SITE "N16"; // Digit select
+IOBUF PORT "digit_sel" IO_TYPE=LVCMOS33;
