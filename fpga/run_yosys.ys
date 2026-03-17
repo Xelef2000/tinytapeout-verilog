@@ -1,5 +1,8 @@
-read_verilog -sv top.v
+read_verilog -sv -DECP5_FPGA top.v
 
 hierarchy -top top
+
+write_verilog -noattr _build/final.v
+
 
 synth_ecp5 -top top -json _build/hardware.json

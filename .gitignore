@@ -12,3 +12,9 @@ test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
 fpga/_build/*
+fpga/_build/
+fpga/_build
+fpga/_build/hardware.bit
+fpga/_build/hardware.json
+fpga/_build/hardware.pnr
+fpga/_build/hardware.svf
