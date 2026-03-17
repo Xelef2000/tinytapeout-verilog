@@ -1,8 +1,8 @@
 `default_nettype none
 
-`include "ring_osc_6.v"
-`include "ring_osc_12.v"
-`include "ring_osc_24.v"
+`include "ring_osc_5.v"
+`include "ring_osc_11.v"
+`include "ring_osc_23   .v"
 
 module random32 (
     input  wire       clk,      // system clock
