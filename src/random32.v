@@ -19,21 +19,21 @@ module random32 (
     // ===================================================================
     // Section 1: Entropy Source
     // ===================================================================
-    wire ring_bit_6, ring_bit_12, ring_bit_24;
+    wire ring_bit_5, ring_bit_11, ring_bit_23;
     wire combined_ring_bit;
     reg  sync1, sync2;
     wire rnd_sync;
 
     // Ring oscillators are enabled by the 'en' signal
-    ring_osc_6 u_ring6 (.en(en), .rnd(ring_bit_6));
-    ring_osc_12 u_ring12 (.en(en), .rnd(ring_bit_12));
-    ring_osc_24 u_ring24 (.en(en), .rnd(ring_bit_24));
+    ring_osc_5 u_ring6 (.en(en), .rnd(ring_bit_5));
+    ring_osc_11 u_ring12 (.en(en), .rnd(ring_bit_11));
+    ring_osc_23 u_ring24 (.en(en), .rnd(ring_bit_23));
 
-    assign ring_out_6  = ring_bit_6;
-    assign ring_out_12 = ring_bit_12;
-    assign ring_out_24 = ring_bit_24;
+    assign ring_out_6  = ring_bit_5;
+    assign ring_out_12 = ring_bit_11;
+    assign ring_out_24 = ring_bit_23;
 
-    assign combined_ring_bit = ring_bit_6 ^ ring_bit_12 ^ ring_bit_24;
+    assign combined_ring_bit = ring_bit_5 ^ ring_bit_11 ^ ring_bit_23;
 
     // Synchronizer for the combined random bit stream
     always @(posedge clk or negedge rst_n) begin

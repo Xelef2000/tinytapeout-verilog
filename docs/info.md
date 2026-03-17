@@ -11,14 +11,14 @@ You can also include images in this folder and reference them in the markdown. E
 
 This project is a true random number generator.
 
-The core of the TRNG is a set of three ring oscillators of different lengths (6, 12, and 24 inverters). These oscillators produce unstable, jittery signals. The outputs are combined using an XOR gate to create a chaotic bit stream.
+The core of the TRNG is a set of three ring oscillators of different lengths (5, 11, and 23 inverters). These oscillators produce unstable, jittery signals. The outputs are combined using an XOR gate to create a chaotic bit stream.
 Here is the ring oscillator frequency estimates:
 
 | Ring Oscillator | Frequency Estimate | Period Estimate |
 |-----------------|--------------------|-----------------|
-| 6               | ~231 MHz           | 4.32 ns         |
-| 12              | ~117 MHz           | 8.52 ns         |
-| 24              | ~59 MHz            | 16.91 ns        |
+| 5               | ~231 MHz           | 4.32 ns         |
+| 11              | ~117 MHz           | 8.52 ns         |
+| 23              | ~59 MHz            | 16.91 ns        |
 
 The raw random bitstream may have a bias (more 1s than 0s). To correct this, a Von Neumann corrector is used. It takes pairs of bits from the stream:
 

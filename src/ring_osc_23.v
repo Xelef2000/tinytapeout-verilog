@@ -1,4 +1,4 @@
-module ring_osc_24 (
+module ring_osc_23 (
     input  wire en, 
     output wire rnd 
 );
@@ -7,10 +7,10 @@ module ring_osc_24 (
     assign rnd = en ? 1'b0 : 1'bz;
 
 `elsif ECP5_FPGA
-    wire n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, gated;
+    wire n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, gated;
 
     (* keep, dont_touch *)
-    LUT4 #(.INIT(16'h7FFF)) u0 (.A(n23), .B(en), .C(1'b1), .D(1'b1), .Z(gated));
+    LUT4 #(.INIT(16'h7FFF)) u0 (.A(n22), .B(en), .C(1'b1), .D(1'b1), .Z(gated));
     (* keep, dont_touch *)
     LUT4 #(.INIT(16'h5555)) u1 (.A(gated), .B(1'b0), .C(1'b0), .D(1'b0), .Z(n1));
     (* keep, dont_touch *)
@@ -60,15 +60,13 @@ module ring_osc_24 (
     LUT4 #(.INIT(16'h5555)) u21 (.A(n20), .B(1'b0), .C(1'b0), .D(1'b0), .Z(n21));
     (* keep, dont_touch *)
     LUT4 #(.INIT(16'h5555)) u22 (.A(n21), .B(1'b0), .C(1'b0), .D(1'b0), .Z(n22));
-    (* keep, dont_touch *)
-    LUT4 #(.INIT(16'h5555)) u23 (.A(n22), .B(1'b0), .C(1'b0), .D(1'b0), .Z(n23));
 
-    assign rnd = n23;
+    assign rnd = n22;
 
 `else
-    wire n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, gated;
+    wire n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, gated;
 
-    (* keep, dont_touch *) sg13g2_nand2_2 u0 (.Y(gated), .A(n23), .B(en));
+    (* keep, dont_touch *) sg13g2_nand2_2 u0 (.Y(gated), .A(n22), .B(en));
 
     (* keep, dont_touch *) sg13g2_inv_2 u1 (.Y(n1), .A(gated));
     (* keep, dont_touch *) sg13g2_inv_2 u2 (.Y(n2), .A(n1));
@@ -92,9 +90,7 @@ module ring_osc_24 (
     (* keep, dont_touch *) sg13g2_inv_2 u20 (.Y(n20), .A(n19));
     (* keep, dont_touch *) sg13g2_inv_2 u21 (.Y(n21), .A(n20));
     (* keep, dont_touch *) sg13g2_inv_2 u22 (.Y(n22), .A(n21));
-    (* keep, dont_touch *) sg13g2_inv_2 u23 (.Y(n23), .A(n22));
-
-    assign rnd = n23;
+    assign rnd = n22;
 `endif
 
 endmodule
